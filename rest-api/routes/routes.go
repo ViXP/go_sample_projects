@@ -6,12 +6,17 @@ import (
 )
 
 func RegisterRoutes(server *gin.Engine) {
-	registerEventsRoutes(server)
-	registerAuthsRoutes(server)
-	registerUsersRoutes(server)
+	useEventsRoutes(server)
+	useAuthRoutes(server)
+	useRegistrationsRoutes(server)
 }
 
-func registerEventsRoutes(server *gin.Engine) {
+func useAuthRoutes(server *gin.Engine) {
+	server.POST("/signup", signUpUser)
+	server.POST("/signin", signInUser)
+}
+
+func useEventsRoutes(server *gin.Engine) {
 	authenticated := server.Group("/events")
 	authenticated.Use(middlewares.Authenticate)
 	authenticated.POST("/", createEvent)
@@ -22,10 +27,9 @@ func registerEventsRoutes(server *gin.Engine) {
 	server.GET("/events/:id", getEvent)
 }
 
-func registerAuthsRoutes(server *gin.Engine) {
-	server.POST("/register", signUpUser)
-	server.POST("/login", signInUser)
-}
-
-func registerUsersRoutes(server *gin.Engine) {
+func useRegistrationsRoutes(server *gin.Engine) {
+	authenticated := server.Group("/")
+	authenticated.Use(middlewares.Authenticate)
+	authenticated.POST("/events/:id/register", createRegistration)
+	authenticated.DELETE("/events/:id/register", deleteRegistration)
 }

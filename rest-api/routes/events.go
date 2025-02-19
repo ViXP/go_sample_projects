@@ -42,7 +42,7 @@ func createEvent(context *gin.Context) {
 	err := context.ShouldBindJSON(&event)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Missing required data"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "missing required data"})
 		return
 	}
 
@@ -73,7 +73,7 @@ func updateEvent(context *gin.Context) {
 	}
 
 	if event.UserID != context.GetInt64("userId") {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "allowed for creator only"})
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "allowed for author only"})
 		return
 	}
 
@@ -113,7 +113,7 @@ func deleteEvent(context *gin.Context) {
 	}
 
 	if event.UserID != context.GetInt64("userId") {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "allowed for creator only"})
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "allowed for author only"})
 		return
 	}
 
