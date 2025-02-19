@@ -37,7 +37,7 @@ func signInUser(context *gin.Context) {
 		return
 	}
 
-	err = user.Authenticate()
+	err = user.VerifyPassword()
 
 	if err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
