@@ -13,7 +13,7 @@ type Event struct {
 	Description string    `binding:"required"`
 	Location    string    `binding:"required"`
 	DateTime    time.Time `binding:"required"`
-	UserID      any
+	UserID      int64
 }
 
 func GetAllEvents() ([]Event, error) {
@@ -60,8 +60,8 @@ func GetEventByID(id int64) (*Event, error) {
 
 func (e *Event) Save() error {
 	query := `
-		INSERT INTO events(name, description, location, date_time)
-		VALUES (?, ?, ?, ?)
+		INSERT INTO events(name, description, location, date_time, user_id)
+		VALUES (?, ?, ?, ?, ?)
 	`
 	prepared, err := db.DB.Prepare(query)
 
@@ -71,7 +71,7 @@ func (e *Event) Save() error {
 
 	defer prepared.Close()
 
-	result, err := prepared.Exec(e.Name, e.Description, e.Location, e.DateTime)
+	result, err := prepared.Exec(e.Name, e.Description, e.Location, e.DateTime, e.UserID)
 
 	if err != nil {
 		return err
