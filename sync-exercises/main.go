@@ -1,8 +1,6 @@
 package main
 
-import (
-	"example.com/sync-exercises/pool"
-)
+import "example.com/sync-exercises/race"
 
 func main() {
 	//mutex.Run()
@@ -10,5 +8,6 @@ func main() {
 	//cond.Run()
 	//cond2.Run()
 	//once.Run()
-	pool.Run()
+	//pool.Run()
+	race.Run()
 }
