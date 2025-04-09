@@ -42,14 +42,11 @@ func setPipeline(root string, dstPath string) error {
 	defer close(done)
 
 	paths, errors := processFiles(done, root)
-
 	results := processImage(done, paths)
+	saves := saveImage(results, dstPath)
 
-	for result := range results {
-		if result.err != nil {
-			return result.err
-		}
-		saveImage(result, dstPath)
+	for save := range saves {
+		fmt.Print(save)
 	}
 
 	if err := <-errors; err != nil {
@@ -102,6 +99,7 @@ func processImage(done <-chan struct{}, paths <-chan string) <-chan *result {
 	wg.Add(routinesNum)
 	for range routinesNum {
 		go func() {
+			defer wg.Done()
 			for path := range paths {
 				src, err := imaging.Open(path)
 
@@ -119,7 +117,6 @@ func processImage(done <-chan struct{}, paths <-chan string) <-chan *result {
 					return
 				}
 			}
-			wg.Done()
 		}()
 	}
 
@@ -130,12 +127,40 @@ func processImage(done <-chan struct{}, paths <-chan string) <-chan *result {
 	return results
 }
 
-func saveImage(res *result, dstPath string) {
-	fileName := filepath.Base(res.path)
-	dstFullPath := dstPath + "/" + fileName
+func saveImage(results <-chan *result, dstPath string) <-chan string {
+	var wg sync.WaitGroup
 
-	imaging.Save(res.image, dstFullPath)
-	fmt.Printf("%s -> %s\n", res.path, dstFullPath)
+	routinesNum := runtime.NumCPU()
+	saves := make(chan string)
+	wg.Add(routinesNum)
+
+	for range routinesNum {
+		go func() {
+			defer wg.Done()
+			for res := range results {
+				if res.err != nil {
+					log.Fatal(res.err)
+				}
+
+				fileName := filepath.Base(res.path)
+				dstFullPath := dstPath + "/" + fileName
+
+				err := imaging.Save(res.image, dstFullPath)
+				if err != nil {
+					log.Fatal(res.err)
+				} else {
+					saves <- fmt.Sprintf("%s -> %s\n", res.path, dstFullPath)
+				}
+			}
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(saves)
+	}()
+
+	return saves
 }
 
 func getFileContentType(path string) (string, error) {
