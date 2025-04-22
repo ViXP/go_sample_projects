@@ -19,21 +19,22 @@ func (builder *AtomXMLBuilder) String() string {
 }
 
 // AddChild is a general interface for adding the child nodes to the feed
-func (builder *AtomXMLBuilder) AddChild(child *XMLNode) {
+func (builder *AtomXMLBuilder) AddChild(child *XMLNode) *AtomXMLBuilder {
 	builder.feedNode.AddChild(child)
+	return builder
 }
 
 // AddFeedSubTitle is a specific builder's method to add the subtitle node to the feed
-func (builder *AtomXMLBuilder) AddFeedSubTitle(subtitle string) {
-	builder.AddChild(&XMLNode{
+func (builder *AtomXMLBuilder) AddFeedSubTitle(subtitle string) *AtomXMLBuilder {
+	return builder.AddChild(&XMLNode{
 		name: "subtitle",
 		text: subtitle,
 	})
 }
 
 // AddFeedAuthor is a specific builder's method to add the author of the feed, with name and email as parameters
-func (builder *AtomXMLBuilder) AddFeedAuthor(name string, email string) {
-	builder.AddChild(&XMLNode{
+func (builder *AtomXMLBuilder) AddFeedAuthor(name string, email string) *AtomXMLBuilder {
+	return builder.AddChild(&XMLNode{
 		name: "author",
 		children: []*XMLNode{
 			{
@@ -50,7 +51,7 @@ func (builder *AtomXMLBuilder) AddFeedAuthor(name string, email string) {
 
 // AddEntry is a specific builder's method to add entry to the feed with optional children and required title. Adds
 // entry with the random UUID.
-func (builder *AtomXMLBuilder) AddEntry(title string, children []*XMLNode) {
+func (builder *AtomXMLBuilder) AddEntry(title string, children []*XMLNode) *AtomXMLBuilder {
 	uuid := uuid.NewV1()
 
 	entryTitleNode := XMLNode{
@@ -68,7 +69,7 @@ func (builder *AtomXMLBuilder) AddEntry(title string, children []*XMLNode) {
 		text: time.Now().Format(time.RFC3339),
 	}
 
-	builder.AddChild(&XMLNode{
+	return builder.AddChild(&XMLNode{
 		name:     "entry",
 		children: append([]*XMLNode{&entryTitleNode, &entryIdNode, &entryUpdatedNode}, children...),
 	})

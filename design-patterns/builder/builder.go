@@ -16,8 +16,7 @@ func Run() {
 			name: "summary",
 			text: "The optional summary of the first entry",
 		},
-	})
-	builder.AddEntry("Second simple entry in the ATOM feed", []*XMLNode{})
+	}).AddEntry("Second simple entry in the ATOM feed", []*XMLNode{}) // add other in the chain manner
 
 	fmt.Println(builder)
 }

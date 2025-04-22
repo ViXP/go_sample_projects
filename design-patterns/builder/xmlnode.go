@@ -45,6 +45,7 @@ func (node *XMLNode) String() (result string) {
 }
 
 // AddChild is a general interface for adding the children of the XMLNode
-func (node *XMLNode) AddChild(child *XMLNode) {
+func (node *XMLNode) AddChild(child *XMLNode) *XMLNode {
 	node.children = append(node.children, child)
+	return node
 }
