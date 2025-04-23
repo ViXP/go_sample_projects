@@ -1,8 +1,9 @@
 package main
 
-import "example.com/design-patterns/builder"
+import "example.com/design-patterns/factory"
 
 func main() {
 	//	specification.Run()
-	builder.Run()
+	// builder.Run()
+	factory.Run()
 }
