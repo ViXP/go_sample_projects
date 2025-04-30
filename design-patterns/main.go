@@ -1,6 +1,6 @@
 package main
 
-import "example.com/design-patterns/adapter"
+import "example.com/design-patterns/bridge"
 
 func main() {
 	//specification.Run()
@@ -8,5 +8,6 @@ func main() {
 	//factory.Run()
 	//prototype.Run()
 	//singleton.Run()
-	adapter.Run()
+	//adapter.Run()
+	bridge.Run()
 }
