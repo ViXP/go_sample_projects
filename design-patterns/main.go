@@ -1,6 +1,8 @@
 package main
 
-import "example.com/design-patterns/composite"
+import (
+	"example.com/design-patterns/decorator"
+)
 
 func main() {
 	//specification.Run()
@@ -10,5 +12,6 @@ func main() {
 	//singleton.Run()
 	//adapter.Run()
 	//bridge.Run()
-	composite.Run()
+	//composite.Run()
+	decorator.Run()
 }
