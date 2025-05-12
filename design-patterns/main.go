@@ -1,8 +1,6 @@
 package main
 
-import (
-	"example.com/design-patterns/decorator"
-)
+import "example.com/design-patterns/facade"
 
 func main() {
 	//specification.Run()
@@ -13,5 +11,6 @@ func main() {
 	//adapter.Run()
 	//bridge.Run()
 	//composite.Run()
-	decorator.Run()
+	//decorator.Run()
+	facade.Run()
 }
