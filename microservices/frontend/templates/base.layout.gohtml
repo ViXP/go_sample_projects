@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+  {{ template "head" . }}
+  <body class="bg-light">
+    <main>
+      <article class="container mt-5">
+        {{ template "content" . }}
+      </article>
+    </main>
+    {{ template "footer" . }}
+    {{ template "inline-js" . }}
+  </body>
+</html>

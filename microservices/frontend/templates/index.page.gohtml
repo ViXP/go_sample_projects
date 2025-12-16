@@ -1,0 +1,54 @@
+import "os"
+
+{{ template "base" . }}
+
+{{ define "content" }}
+  <h1 class="text-success-emphasis">Microservices Client</h1>
+  <div class="row">
+    <hr>
+    <div class="col">
+      <button id="triggerBroker" class="btn btn-primary">Poke the Broker</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h4 class="mt-5">Sent data</h4>
+      <div class="mt-1" style="outline: 1px solid silver; padding: 2em;">
+        <pre id="sent">
+          <span class="text-muted">Nothing is sent.</span>
+        </pre>
+      </div>
+    </div>
+    <div class="col">
+      <h4 class="mt-5">Received data</h4>
+      <div class="mt-1" style="outline: 1px solid silver; padding: 2em; position: relative;">
+        <strong id="statusCode" class="text-primary bg-white m-2" style="position: absolute; right:0; top: 0;"></strong>
+        <pre id="received">
+          <span class="text-muted">Nothing is Received.</span>
+        </pre>
+      </div>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "inline-js" }}
+<script>
+  const receivedElement = document.getElementById("received");
+  const sentElement = document.getElementById("sent");
+  const statusCodeElement = document.getElementById("statusCode");
+
+  document.getElementById("triggerBroker").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    fetch({{ .BrokerUrl }}, { method: "POST" }
+    ).then(async (response) => {
+      let data = await response.json();
+      return [response.status, data]
+    }).then(([code, data]) => {
+      sentElement.innerText = "Empty request"
+      receivedElement.innerText = JSON.stringify(data, undefined, 4);
+      statusCodeElement.innerText = code;
+    }).catch((err) => console.error(err));
+  });
+</script>
+{{ end }}

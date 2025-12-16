@@ -1,0 +1,21 @@
+services:
+  default: &default
+    image: golang:tip-trixie
+    command: go run .
+    deploy:
+      replicas: 1
+      mode: replicated
+  frontend:
+    <<: *default
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/go:rw
+    environment:
+      - BROKER_URL=http://localhost:81
+  broker-service:
+    <<: *default
+    ports:
+      - "81:80"
+    volumes:
+      - ./broker-service:/go:rw
