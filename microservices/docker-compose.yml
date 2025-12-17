@@ -1,7 +1,7 @@
 services:
   default: &default
     image: golang:tip-trixie
-    command: go run .
+    command: sh -c "go build -o compiled_app; ./compiled_app"
     deploy:
       replicas: 1
       mode: replicated

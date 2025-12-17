@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 )
 
@@ -12,8 +11,5 @@ func (app *App) Broker(w http.ResponseWriter, r *http.Request) {
 		Message: "Broker Service is triggered",
 	}
 
-	output, _ := json.MarshalIndent(responsePayload, "", "\t")
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(output)
+	_ = app.writeJSON(w, http.StatusOK, responsePayload)
 }
