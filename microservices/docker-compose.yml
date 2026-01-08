@@ -1,21 +1,85 @@
 services:
-  default: &default
+  _: &builder
     image: golang:tip-trixie
     command: sh -c "go build -o compiled_app; ./compiled_app"
     deploy:
       replicas: 1
       mode: replicated
+  __: &runner
+    <<: *builder
+    command: go run .
+
+  db:
+    image: postgres:18-trixie
+    restart: always
+    deploy:
+      replicas: 1
+      mode: replicated
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: dbclient
+      POSTGRES_PASSWORD: dbclientpass
+      POSTGRES_DB: microservices_db
+    volumes:
+      - db_data:/var/lib/postgresql
+
+  pgadmin:
+    image: dpage/pgadmin4:9.8
+    ports:
+      - 5050:80
+    deploy:
+      replicas: 1
+      mode: replicated
+    environment:
+      PGADMIN_DEFAULT_EMAIL: postgres@postgres.com
+      PGADMIN_DEFAULT_PASSWORD: postgres
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+
   frontend:
-    <<: *default
+    <<: *runner
     ports:
       - "80:80"
     volumes:
       - ./frontend:/go:rw
     environment:
       - BROKER_URL=http://localhost:81
-  broker-service:
-    <<: *default
+  frontend_builder:
+    <<: *builder
+    volumes:
+      - ./frontend:/go:rw
+
+  broker:
+    <<: *runner
     ports:
       - "81:80"
     volumes:
       - ./broker-service:/go:rw
+  broker_builder:
+    <<: *builder
+    volumes:
+      - ./broker-service:/go:rw
+
+  auth:
+    <<: *runner
+    depends_on:
+      - db
+    ports:
+      - "82:80"
+    environment:
+      - POSTGRES_URL=postgres://dbclient:dbclientpass@db:5432/microservices_db?sslmode=disable
+    volumes:
+      - ./auth-service:/go:rw
+
+  auth_builder:
+    <<: *builder
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_URL=postgres://dbclient:dbclientpass@db:5432/microservices_db?sslmode=disable
+    volumes:
+      - ./auth-service:/go:rw
+
+volumes:
+  db_data: {}
