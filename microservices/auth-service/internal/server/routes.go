@@ -3,7 +3,6 @@ package server
 import (
 	"auth-service/internal/controllers"
 	"auth-service/internal/data"
-	"database/sql"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -11,12 +10,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-type App struct {
-	DB     *sql.DB
-	Models *data.Models
-}
-
-func (app *App) Routes() http.Handler {
+func Routes(app *data.App) http.Handler {
 	router := chi.NewRouter()
 	router.Use(
 		cors.Handler(cors.Options{
@@ -34,7 +28,7 @@ func (app *App) Routes() http.Handler {
 
 	router.Route("/api/v1", func(r chi.Router) {
 		r.Route("/users", func(r chi.Router) {
-			c := controllers.UsersController{}
+			c := controllers.NewUsersController(app)
 			r.Post("/authenticate", c.Authenticate)
 			r.Post("/", c.Create)
 		})

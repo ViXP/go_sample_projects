@@ -1,13 +1,54 @@
 package controllers
 
-import "net/http"
+import (
+	"auth-service/internal/data"
+	"errors"
+	"net/http"
 
-type UsersController struct{}
+	apiview "github.com/ViXP/go_sample_projects/microservices/api-view-helpers"
+)
+
+type UsersController struct {
+	models *data.Models
+}
 
 func (controller *UsersController) Authenticate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
+	type requestPayload struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	payload := requestPayload{}
+
+	err := apiview.ReadJSON(w, r, &payload)
+
+	if err != nil {
+		apiview.ErrorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	user, err := controller.models.User.FindByEmail(payload.Email)
+
+	if err != nil {
+		apiview.ErrorJSON(w, errors.New("Credentials are incorrect"), http.StatusNotFound)
+		return
+	}
+
+	if user.IsCorrectPassword(payload.Password) {
+		apiview.WriteJSON(w, http.StatusAccepted, "Authenticated")
+	} else {
+		apiview.ErrorJSON(w, errors.New("Wrong password"), http.StatusUnauthorized)
+	}
 }
 
 func (controller *UsersController) Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+}
+
+func NewUsersController(app *data.App) *UsersController {
+	return &UsersController{
+		models: app.Models,
+	}
 }

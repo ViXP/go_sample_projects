@@ -1,6 +1,7 @@
 package server
 
 import (
+	"auth-service/internal/data"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -36,8 +37,8 @@ func InitializeDBConnection() (*sql.DB, error) {
 	return pgConn, nil
 }
 
-func InitializeServer(app *App, port int) error {
+func InitializeServer(app *data.App, port int) error {
 	log.Println("Starting authentication service")
 
-	return http.ListenAndServe(fmt.Sprintf(":%v", port), app.Routes())
+	return http.ListenAndServe(fmt.Sprintf(":%v", port), Routes(app))
 }

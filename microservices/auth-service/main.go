@@ -21,7 +21,7 @@ func main() {
 
 	defer pgConn.Close()
 
-	app := server.App{
+	app := data.App{
 		DB:     pgConn,
 		Models: data.NewModels(pgConn),
 	}
