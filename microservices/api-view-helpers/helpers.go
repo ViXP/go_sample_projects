@@ -6,15 +6,13 @@ import (
 	"net/http"
 )
 
-type ViewHelpers struct{}
-
-type jsonResponse struct {
+type JsonResponse struct {
 	Error   bool   `json:"error"`
 	Message string `json:"message"`
 	Data    any    `json:"data,omitempty"`
 }
 
-func (helpers *ViewHelpers) ReadJSON(w http.ResponseWriter, r *http.Request, data any) error {
+func ReadJSON(w http.ResponseWriter, r *http.Request, data any) error {
 	var maxBytes int64 = 1 * 1024 * 1024
 
 	r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
@@ -30,7 +28,7 @@ func (helpers *ViewHelpers) ReadJSON(w http.ResponseWriter, r *http.Request, dat
 	return nil
 }
 
-func (helpers *ViewHelpers) WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Header) error {
+func WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Header) error {
 	serialized, err := json.Marshal(data)
 
 	if err != nil {
@@ -41,7 +39,7 @@ func (helpers *ViewHelpers) WriteJSON(w http.ResponseWriter, status int, data an
 		maps.Copy(w.Header(), headers[0])
 	}
 
-	w.Header().Set("Content-Type", "helperslication/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 
 	_, err = w.Write(serialized)
@@ -53,16 +51,16 @@ func (helpers *ViewHelpers) WriteJSON(w http.ResponseWriter, status int, data an
 	return nil
 }
 
-func (helpers *ViewHelpers) ErrorJSON(w http.ResponseWriter, err error, status ...int) error {
+func ErrorJSON(w http.ResponseWriter, err error, status ...int) error {
 	var statusCode int = http.StatusBadRequest
 
 	if len(status) > 0 {
 		statusCode = status[0]
 	}
 
-	var responsePayload jsonResponse
+	var responsePayload JsonResponse
 	responsePayload.Error = true
 	responsePayload.Message = err.Error()
 
-	return helpers.WriteJSON(w, statusCode, responsePayload)
+	return WriteJSON(w, statusCode, responsePayload)
 }
