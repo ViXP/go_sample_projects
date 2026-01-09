@@ -1,4 +1,4 @@
-package main
+package api_view_helpers
 
 import (
 	"encoding/json"
