@@ -56,10 +56,12 @@ services:
       - "81:80"
     volumes:
       - ./broker-service:/go:rw
+      - ./api-view-helpers:/api-view-helpers:rw
   broker_builder:
     <<: *builder
     volumes:
       - ./broker-service:/go:rw
+      - ./api-view-helpers:/api-view-helpers:rw
 
   auth:
     <<: *runner
@@ -71,7 +73,7 @@ services:
       - POSTGRES_URL=postgres://dbclient:dbclientpass@db:5432/microservices_db?sslmode=disable
     volumes:
       - ./auth-service:/go:rw
-
+      - ./api-view-helpers:/api-view-helpers:rw
   auth_builder:
     <<: *builder
     depends_on:
@@ -80,6 +82,7 @@ services:
       - POSTGRES_URL=postgres://dbclient:dbclientpass@db:5432/microservices_db?sslmode=disable
     volumes:
       - ./auth-service:/go:rw
+      - ./api-view-helpers:/api-view-helpers:rw
 
 volumes:
   db_data: {}

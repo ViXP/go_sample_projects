@@ -1,6 +1,7 @@
 package main
 
 import (
+	"broker-service/internal/server"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,10 +9,8 @@ import (
 
 const port = 80
 
-type App struct{}
-
 func main() {
-	app := App{}
+	app := server.App{}
 
 	log.Printf("Starting the Broker Service on port :%v", port)
 	http.ListenAndServe(fmt.Sprintf(":%v", port), app.Routes())
