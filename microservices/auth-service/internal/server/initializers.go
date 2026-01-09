@@ -37,8 +37,8 @@ func InitializeDBConnection() (*sql.DB, error) {
 	return pgConn, nil
 }
 
-func InitializeServer(app *data.App, port int) error {
+func InitializeServer(store *data.Store, port int) error {
 	log.Println("Starting authentication service")
 
-	return http.ListenAndServe(fmt.Sprintf(":%v", port), Routes(app))
+	return http.ListenAndServe(fmt.Sprintf(":%v", port), Routes(store))
 }

@@ -21,12 +21,12 @@ func main() {
 
 	defer pgConn.Close()
 
-	app := data.App{
+	store := data.Store{
 		DB:     pgConn,
 		Models: data.NewModels(pgConn),
 	}
 
-	err = server.InitializeServer(&app, port)
+	err = server.InitializeServer(&store, port)
 
 	if err != nil {
 		log.Panic(err)

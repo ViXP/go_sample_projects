@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func Routes(app *data.App) http.Handler {
+func Routes(store *data.Store) http.Handler {
 	router := chi.NewRouter()
 	router.Use(
 		cors.Handler(cors.Options{
@@ -28,7 +28,7 @@ func Routes(app *data.App) http.Handler {
 
 	router.Route("/api/v1", func(r chi.Router) {
 		r.Route("/users", func(r chi.Router) {
-			c := controllers.NewUsersController(app)
+			c := controllers.NewUsersController(store)
 			r.Post("/authenticate", c.Authenticate)
 			r.Post("/", c.Create)
 		})

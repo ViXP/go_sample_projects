@@ -47,8 +47,8 @@ func (controller *UsersController) Create(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Content-Type", "application/json")
 }
 
-func NewUsersController(app *data.App) *UsersController {
+func NewUsersController(store *data.Store) *UsersController {
 	return &UsersController{
-		models: app.Models,
+		models: store.Models,
 	}
 }
