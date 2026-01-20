@@ -5,9 +5,19 @@ import "os"
 {{ define "content" }}
   <h1 class="text-success-emphasis">Microservices Client</h1>
   <div class="row">
-    <hr>
+    <div class="col">
+      <hr/>
+    </div>
+  </div>
+  <div class="row">
     <div class="col">
       <button id="triggerBroker" class="btn btn-primary">Poke the Broker</button>
+      <button id="authenticateRequest" class="btn btn-primary">Authenticate</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <hr/>
     </div>
   </div>
   <div class="row">
@@ -36,6 +46,34 @@ import "os"
   const receivedElement = document.getElementById("received");
   const sentElement = document.getElementById("sent");
   const statusCodeElement = document.getElementById("statusCode");
+
+  document.getElementById("authenticateRequest").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    const payload = JSON.stringify({
+      action: "auth",
+      auth: {
+        email: "test@example.com",
+        password: "password"
+      }
+    });
+
+    fetch({{ .AuthenticationUrl }}, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: payload,
+    }).then(async (response) => {
+      let data = await response.json();
+      return [response.status, data]
+    }).then(([code, data]) => {
+      sentElement.innerText = payload;
+      receivedElement.innerText = JSON.stringify(data, undefined, 4);
+      statusCodeElement.innerText = code;
+    }).catch((err) => console.error(err));
+  });
+
 
   document.getElementById("triggerBroker").addEventListener("click", (event) => {
     event.preventDefault();

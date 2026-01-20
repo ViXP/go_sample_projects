@@ -57,11 +57,15 @@ services:
     volumes:
       - ./broker-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
+    environment:
+      - AUTH_URL=http://auth:80
   broker_builder:
     <<: *builder
     volumes:
       - ./broker-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
+    environment:
+      - AUTH_URL=http://auth_builder:80
 
   auth:
     <<: *runner

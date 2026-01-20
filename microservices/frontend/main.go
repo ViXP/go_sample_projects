@@ -42,6 +42,7 @@ func render(w http.ResponseWriter, specificTemplateName string) {
 
 func templateData() *map[string]string {
 	return &map[string]string{
-		"BrokerUrl": os.Getenv("BROKER_URL"),
+		"BrokerUrl":         os.Getenv("BROKER_URL"),
+		"AuthenticationUrl": os.Getenv("BROKER_URL") + "/handle",
 	}
 }

@@ -24,7 +24,8 @@ func (app *App) Routes() http.Handler {
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Broker Service is up and running"))
 	})
-	router.Post("/", app.Broker)
+	router.Post("/", app.TriggerBroker)
+	router.Post("/handle", app.HandleProxyRequest)
 
 	return router
 }

@@ -28,9 +28,21 @@ func ReadJSON(w http.ResponseWriter, r *http.Request, data any) error {
 	return nil
 }
 
-func WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Header) error {
-	serialized, err := json.Marshal(data)
+func decorateResponsePayload(data any) any {
+	var decoratedPayload any
 
+	stringPayload, ok := data.(string)
+
+	if ok {
+		decoratedPayload = JsonResponse{Message: stringPayload, Error: false}
+	} else {
+		decoratedPayload = data
+	}
+	return decoratedPayload
+}
+
+func WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Header) error {
+	serialized, err := json.Marshal(decorateResponsePayload(data))
 	if err != nil {
 		return err
 	}
