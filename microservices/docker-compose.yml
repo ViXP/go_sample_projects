@@ -9,6 +9,7 @@ services:
     <<: *builder
     command: go run .
 
+  ### Databases ###
   db:
     image: postgres:18-trixie
     restart: always
@@ -23,6 +24,7 @@ services:
       POSTGRES_DB: microservices_db
     volumes:
       - db_data:/var/lib/postgresql
+      - ./scripts/db_seed.sql:/docker-entrypoint-initdb.d/db_seed.sql:ro
 
   pgadmin:
     image: dpage/pgadmin4:9.8
@@ -36,7 +38,31 @@ services:
       PGADMIN_DEFAULT_PASSWORD: postgres
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_REPLACE_SERVERS_ON_STARTUP: "True"
+    volumes:
+      - ./scripts/pgadmin_config.json:/pgadmin4/servers.json:ro
 
+  mongodb:
+    image: mongo:8.2.3-noble
+    environment:
+      MONGO_INITDB_DATABASE: logs
+      MONGO_INITDB_ROOT_USERNAME: mongoclient
+      MONGO_INITDB_ROOT_PASSWORD: mongoclientpass
+    volumes:
+      - mongo_data:/data/db
+      - ./scripts/mongodb_seed.js:/docker-entrypoint-initdb.d/mongodb_seed.js:ro
+
+  mongoexpress:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongoclient:mongoclientpass@mongodb:27017/
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: mongo
+      ME_CONFIG_BASICAUTH_PASSWORD: mongo
+
+  ####### Microservices #######
   frontend:
     <<: *runner
     ports:
@@ -59,6 +85,7 @@ services:
       - ./api-view-helpers:/api-view-helpers:rw
     environment:
       - AUTH_URL=http://auth:80
+      - LOGGER_URL=http://logger:80
   broker_builder:
     <<: *builder
     volumes:
@@ -66,6 +93,7 @@ services:
       - ./api-view-helpers:/api-view-helpers:rw
     environment:
       - AUTH_URL=http://auth_builder:80
+      - LOGGER_URL=http://logger_builder:80
 
   auth:
     <<: *runner
@@ -88,5 +116,21 @@ services:
       - ./auth-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
 
+  logger:
+    <<: *runner
+    volumes:
+      - ./logger-service:/go:rw
+      - ./api-view-helpers:/api-view-helpers:rw
+    environment:
+      - MONGODB_URL=mongodb://mongoclient:mongoclientpass@mongodb:27017/
+  logger_builder:
+    <<: *builder
+    volumes:
+      - ./logger-service:/go:rw
+      - ./api-view-helpers:/api-view-helpers:rw
+    environment:
+      - MONGODB_URL=mongodb://mongoclient:mongoclientpass@mongodb:27017/
+
 volumes:
   db_data: {}
+  mongo_data: {}
