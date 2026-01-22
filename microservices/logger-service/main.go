@@ -13,10 +13,12 @@ const (
 )
 
 func main() {
-	client, err := server.InitializeDBConnection(os.Getenv("MONGODB_URL"))
+	client, disconnect, err := server.InitializeDBConnection(os.Getenv("MONGODB_URL"))
 	if err != nil {
 		log.Panic(err)
 	}
+
+	defer disconnect()
 
 	store := data.NewStore(client)
 

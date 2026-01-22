@@ -13,6 +13,7 @@ import "os"
     <div class="col">
       <button id="triggerBroker" class="btn btn-primary">Poke the Broker</button>
       <button id="authenticateRequest" class="btn btn-primary">Authenticate</button>
+      <button id="logRequest" class="btn btn-primary">Write log</button>
     </div>
   </div>
   <div class="row">
@@ -58,7 +59,7 @@ import "os"
       }
     });
 
-    fetch({{ .AuthenticationUrl }}, {
+    fetch({{ .HandleUrl }}, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -84,6 +85,33 @@ import "os"
       return [response.status, data]
     }).then(([code, data]) => {
       sentElement.innerText = "Empty request"
+      receivedElement.innerText = JSON.stringify(data, undefined, 4);
+      statusCodeElement.innerText = code;
+    }).catch((err) => console.error(err));
+  });
+
+  document.getElementById("logRequest").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    const payload = JSON.stringify({
+      action: "log",
+      log: {
+        name: "BROKER_REQUEST",
+        data: "Generic broker's request is logged."
+      }
+    });
+
+    fetch({{ .HandleUrl }}, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: payload,
+    }).then(async (response) => {
+      let data = await response.json();
+      return [response.status, data]
+    }).then(([code, data]) => {
+      sentElement.innerText = payload;
       receivedElement.innerText = JSON.stringify(data, undefined, 4);
       statusCodeElement.innerText = code;
     }).catch((err) => console.error(err));

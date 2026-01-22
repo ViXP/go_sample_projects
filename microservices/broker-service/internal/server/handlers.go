@@ -35,6 +35,8 @@ func (app *App) HandleProxyRequest(w http.ResponseWriter, r *http.Request) {
 	switch requestPayload.Action {
 	case "auth":
 		app.Authenticate(w, r, requestPayload.Auth)
+	case "log":
+		app.LogRequest(w, r, requestPayload.Log)
 	default:
 		apiview.ErrorJSON(w, errors.New("unknown action"), http.StatusBadRequest)
 	}
@@ -45,6 +47,36 @@ func (app *App) Authenticate(w http.ResponseWriter, r *http.Request, a AuthPaylo
 	body := bytes.NewBuffer(authData)
 
 	response, err := http.Post(os.Getenv("AUTH_URL")+"/api/v1/users/authenticate", "application/json", body)
+
+	if err != nil {
+		apiview.ErrorJSON(w, err)
+		return
+	}
+
+	defer response.Body.Close()
+
+	var responsePayload apiview.JsonResponse
+
+	err = json.NewDecoder(response.Body).Decode(&responsePayload)
+
+	if err != nil {
+		apiview.ErrorJSON(w, err)
+		return
+	}
+
+	if responsePayload.Error {
+		apiview.ErrorJSON(w, errors.New(responsePayload.Message), response.StatusCode)
+		return
+	}
+
+	apiview.WriteJSON(w, response.StatusCode, responsePayload)
+}
+
+func (app *App) LogRequest(w http.ResponseWriter, r *http.Request, payload LogPayload) {
+	logData, _ := json.MarshalIndent(payload, "", "  ")
+	body := bytes.NewBuffer(logData)
+
+	response, err := http.Post(os.Getenv("LOGGER_URL")+"/api/v1/logs", "application/json", body)
 
 	if err != nil {
 		apiview.ErrorJSON(w, err)
