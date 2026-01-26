@@ -109,6 +109,7 @@ services:
       - "82:80"
     environment:
       - POSTGRES_URL=postgres://dbclient:dbclientpass@db:5432/microservices_db?sslmode=disable
+      - LOGGER_URL=http://logger:80
     volumes:
       - ./auth-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
@@ -118,6 +119,7 @@ services:
       - db
     environment:
       - POSTGRES_URL=postgres://dbclient:dbclientpass@db:5432/microservices_db?sslmode=disable
+      - LOGGER_URL=http://logger_builder:80
     volumes:
       - ./auth-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw

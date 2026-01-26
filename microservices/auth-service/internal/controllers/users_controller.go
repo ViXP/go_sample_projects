@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"auth-service/internal/data"
+	"auth-service/internal/utils"
 	"errors"
+	"fmt"
 	"net/http"
 
 	apiview "github.com/ViXP/go_sample_projects/microservices/api-view-helpers"
@@ -37,6 +39,7 @@ func (controller *UsersController) Authenticate(w http.ResponseWriter, r *http.R
 	}
 
 	if user.IsCorrectPassword(payload.Password) {
+		utils.Log(fmt.Sprintf("User #%v is authenticated", user.ID))
 		apiview.WriteJSON(w, http.StatusAccepted, "Authenticated")
 	} else {
 		apiview.ErrorJSON(w, errors.New("Wrong password"), http.StatusUnauthorized)
