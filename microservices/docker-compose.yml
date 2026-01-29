@@ -68,7 +68,16 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME: mongo
       ME_CONFIG_BASICAUTH_PASSWORD: mongo
 
-  ####### Microservices #######
+  ### Other services ###
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "8082:8025"
+    deploy:
+      replicas: 1
+      mode: replicated
+
+  ### Microservices ###
   frontend:
     <<: *runner
     ports:
@@ -138,6 +147,21 @@ services:
       - ./api-view-helpers:/api-view-helpers:rw
     environment:
       - MONGODB_URL=mongodb://mongoclient:mongoclientpass@mongodb:27017/
+
+  mailer:
+    <<: *runner
+    volumes:
+      - ./mailer-service:/go:rw
+      - ./api-view-helpers:/api-view-helpers:rw
+    environment:
+      - SMTP_URL=http://test:test@mailhog:8025
+  mailer_builder:
+    <<: *builder
+    volumes:
+      - ./mailer-service:/go:rw
+      - ./api-view-helpers:/api-view-helpers:rw
+    environment:
+      - SMTP_URL=http://test:test@mailhog:8025
 
 volumes:
   db_data: {}
