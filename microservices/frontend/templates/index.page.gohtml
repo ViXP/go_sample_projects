@@ -14,6 +14,7 @@ import "os"
       <button id="triggerBroker" class="btn btn-primary">Poke the Broker</button>
       <button id="authenticateRequest" class="btn btn-primary">Authenticate</button>
       <button id="logRequest" class="btn btn-primary">Write log</button>
+      <button id="sendEmail" class="btn btn-primary">Send Email</button>
     </div>
   </div>
   <div class="row">
@@ -98,6 +99,35 @@ import "os"
       log: {
         name: "BROKER_REQUEST",
         data: "Generic broker's request is logged."
+      }
+    });
+
+    fetch({{ .HandleUrl }}, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: payload,
+    }).then(async (response) => {
+      let data = await response.json();
+      return [response.status, data]
+    }).then(([code, data]) => {
+      sentElement.innerText = payload;
+      receivedElement.innerText = JSON.stringify(data, undefined, 4);
+      statusCodeElement.innerText = code;
+    }).catch((err) => console.error(err));
+  });
+
+
+  document.getElementById("sendEmail").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    const payload = JSON.stringify({
+      action: "mail",
+      mail: {
+        to: "test@example.com",
+        subject: "Test Email",
+        body: "This is a test email sent from the broker service."
       }
     });
 

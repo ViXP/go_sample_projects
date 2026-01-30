@@ -10,7 +10,7 @@ import (
 const serverPort = 80
 
 func main() {
-	fmt.Printf("Starting the Mailer service on the port #%v...", serverPort)
+	fmt.Printf("Starting the Mailer service on the port #%v...\n", serverPort)
 	err := http.ListenAndServe(fmt.Sprintf(":%v", serverPort), server.Routes())
 
 	if err != nil {

@@ -107,8 +107,8 @@ func (c *SMTPClient) buildSMTPClient() (*mail.SMTPClient, error) {
 	mailSrv.Password = c.Password
 	mailSrv.Encryption = c.Encryption
 	mailSrv.KeepAlive = false
-	mailSrv.ConnectTimeout = 10 * time.Second
-	mailSrv.SendTimeout = 10 * time.Second
+	mailSrv.ConnectTimeout = 15 * time.Second
+	mailSrv.SendTimeout = 20 * time.Second
 
 	return mailSrv.Connect()
 }

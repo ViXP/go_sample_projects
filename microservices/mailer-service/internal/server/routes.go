@@ -64,5 +64,5 @@ func handleSendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiview.WriteJSON(w, http.StatusCreated, fmt.Sprintf("Email is sent successfully to %s", requestPayload.To))
+	apiview.WriteJSON(w, http.StatusCreated, fmt.Sprintf("Email is sent successfully to %s\n", requestPayload.To))
 }

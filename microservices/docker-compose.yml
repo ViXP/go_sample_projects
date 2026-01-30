@@ -101,6 +101,7 @@ services:
     environment:
       - AUTH_URL=http://auth:80
       - LOGGER_URL=http://logger:80
+      - MAILER_URL=http://mailer:80
   broker_builder:
     <<: *builder
     volumes:
@@ -109,6 +110,7 @@ services:
     environment:
       - AUTH_URL=http://auth_builder:80
       - LOGGER_URL=http://logger_builder:80
+      - MAILER_URL=http://mailer_builder:80
 
   auth:
     <<: *runner
@@ -154,14 +156,14 @@ services:
       - ./mailer-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
     environment:
-      - SMTP_URL=http://test:test@mailhog:8025
+      - SMTP_URL=smtp://test:test@mailhog:1025
   mailer_builder:
     <<: *builder
     volumes:
       - ./mailer-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
     environment:
-      - SMTP_URL=http://test:test@mailhog:8025
+      - SMTP_URL=smtp://test:test@mailhog:1025
 
 volumes:
   db_data: {}
