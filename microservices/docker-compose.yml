@@ -69,6 +69,16 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: mongo
 
   ### Other services ###
+  rabbitmq:
+    image: rabbitmq:4.2.3-management-alpine
+    ports:
+      - 8083:15672
+    deploy:
+      replicas: 1
+      mode: replicated
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
   mailhog:
     image: mailhog/mailhog:latest
     ports:
@@ -137,6 +147,8 @@ services:
 
   logger:
     <<: *runner
+    depends_on:
+      - mongodb
     volumes:
       - ./logger-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
@@ -144,6 +156,8 @@ services:
       - MONGODB_URL=mongodb://mongoclient:mongoclientpass@mongodb:27017/
   logger_builder:
     <<: *builder
+    depends_on:
+      - mongodb
     volumes:
       - ./logger-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
@@ -152,6 +166,8 @@ services:
 
   mailer:
     <<: *runner
+    depends_on:
+      - mailhog
     volumes:
       - ./mailer-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
@@ -159,12 +175,30 @@ services:
       - SMTP_URL=smtp://test:test@mailhog:1025
   mailer_builder:
     <<: *builder
+    depends_on:
+      - mailhog
     volumes:
       - ./mailer-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
     environment:
       - SMTP_URL=smtp://test:test@mailhog:1025
 
+  dispatcher:
+    <<: *runner
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./dispatcher-service:/go:rw
+      - ./api-view-helpers:/api-view-helpers:rw
+  dispatcher_builder:
+    <<: *builder
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./dispatcher-service:/go:rw
+      - ./api-view-helpers:/api-view-helpers:rw
+
 volumes:
   db_data: {}
   mongo_data: {}
+  rabbitmq_data: {}

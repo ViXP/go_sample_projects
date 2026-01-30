@@ -1,17 +1,17 @@
 # Makefile for managing the microservices infrastructure
 run:
 	@echo "Running the microservices infrastructure"
-	docker compose up -d db mongodb mailhog frontend broker auth logger mailer
+	docker compose up -d frontend broker auth logger mailer dispatcher
 	@echo "The containers started"
 
 brun:
 	@echo "Compiling and running the microservices infrastructure"
-	docker compose up -d db mongodb mailhog frontend_builder broker_builder auth_builder logger_builder mailer_builder
+	docker compose up -d frontend_builder broker_builder auth_builder logger_builder mailer_builder dispatcher_builder
 	@echo "The containers started"
 
 db:
-	@echo "Starting only the database containers"
-	docker compose up -d db mongodb mongoexpress pgadmin
+	@echo "Starting only the database and message brokers containers"
+	docker compose up -d db mongodb mongoexpress pgadmin rabbitmq
 	@echo "The database container started"
 
 stop:
