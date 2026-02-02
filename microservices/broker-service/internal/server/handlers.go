@@ -1,6 +1,7 @@
 package server
 
 import (
+	"broker-service/internal/event"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -36,7 +37,7 @@ func (app *App) HandleProxyRequest(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.Authenticate(w, r, requestPayload.Auth)
 	case "log":
-		app.LogRequest(w, r, requestPayload.Log)
+		app.PublishLogEvent(w, r, requestPayload.Log)
 	case "mail":
 		app.SendMail(w, r, requestPayload.Mail)
 	default:
@@ -131,4 +132,67 @@ func (app *App) SendMail(w http.ResponseWriter, r *http.Request, payload MailerP
 	}
 
 	apiview.WriteJSON(w, response.StatusCode, responsePayload)
+}
+
+func (app *App) PublishLogEvent(w http.ResponseWriter, r *http.Request, payload LogPayload) {
+	eventPayload := EventPayload{
+		Name: payload.Name,
+		Data: payload.Data,
+	}
+
+	err := app.emitEvent("log.INFO", eventPayload)
+
+	if err != nil {
+		apiview.ErrorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	apiview.WriteJSON(w, http.StatusCreated, apiview.JsonResponse{
+		Error:   false,
+		Message: "Event emitted successfully.",
+	})
+}
+
+func (app *App) PublishAuthEvent(w http.ResponseWriter, r *http.Request, payload AuthPayload) {
+	serializedPayload, err := json.MarshalIndent(payload, "", "  ")
+
+	if err != nil {
+		apiview.ErrorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	eventPayload := EventPayload{
+		Name: "auth",
+		Data: string(serializedPayload),
+	}
+
+	err = app.emitEvent("auth.INFO", eventPayload)
+
+	if err != nil {
+		apiview.ErrorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	apiview.WriteJSON(w, http.StatusCreated, apiview.JsonResponse{
+		Error:   false,
+		Message: "Event emitted successfully.",
+	})
+}
+
+const rabbitExchangeName = "microservices_topics"
+
+func (app *App) emitEvent(routingKey string, payload EventPayload) error {
+	emitter, err := event.NewEmitter(app.RabbitConn, rabbitExchangeName)
+
+	if err != nil {
+		return err
+	}
+
+	body, err := json.MarshalIndent(&payload, "", "  ")
+
+	if err != nil {
+		return err
+	}
+
+	return emitter.Emit(string(body), routingKey)
 }

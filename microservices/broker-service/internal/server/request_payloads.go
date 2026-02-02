@@ -24,3 +24,8 @@ type MailerPayload struct {
 	Subject  string `json:"subject"`
 	Body     string `json:"body"`
 }
+
+type EventPayload struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
+}

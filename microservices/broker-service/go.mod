@@ -8,4 +8,6 @@ require (
 	github.com/go-chi/cors v1.2.2
 )
 
+require github.com/rabbitmq/amqp091-go v1.10.0
+
 replace github.com/ViXP/go_sample_projects/microservices/api-view-helpers => ../api-view-helpers
