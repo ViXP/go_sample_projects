@@ -49,8 +49,7 @@ func (c *Consumer) Listen(topics ...string) error {
 			}
 
 			message.Ack(false)
-			payload.RoutingKey = message.RoutingKey
-			log.Println("Received message with topic:", message.RoutingKey)
+			log.Println("Received message with the name:", payload.Name)
 			go payload.Handle()
 		}
 	}()

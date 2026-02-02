@@ -135,12 +135,19 @@ func (app *App) SendMail(w http.ResponseWriter, r *http.Request, payload MailerP
 }
 
 func (app *App) PublishLogEvent(w http.ResponseWriter, r *http.Request, payload LogPayload) {
-	eventPayload := EventPayload{
-		Name: payload.Name,
-		Data: payload.Data,
+	serializedPayload, err := json.MarshalIndent(payload, "", "  ")
+
+	if err != nil {
+		apiview.ErrorJSON(w, err, http.StatusBadRequest)
+		return
 	}
 
-	err := app.emitEvent("log.INFO", eventPayload)
+	eventPayload := EventPayload{
+		Name: "log",
+		Data: string(serializedPayload),
+	}
+
+	err = app.emitEvent("log.INFO", eventPayload)
 
 	if err != nil {
 		apiview.ErrorJSON(w, err, http.StatusInternalServerError)

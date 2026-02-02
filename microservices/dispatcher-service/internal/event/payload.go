@@ -1,18 +1,17 @@
 package event
 
 type Payload struct {
-	Name       string `json:"name"`
-	Data       string `json:"data"`
-	RoutingKey string
+	Name string `json:"name"`
+	Data string `json:"data"`
 }
 
 func (p *Payload) Handle() {
 	var handler Handler
 
-	switch p.RoutingKey {
-	case "log.INFO":
+	switch p.Name {
+	case "log":
 		handler = &LogHandler{}
-	case "auth.INFO":
+	case "auth":
 		handler = &AuthHandler{}
 	default:
 		handler = &DefaultHandler{}

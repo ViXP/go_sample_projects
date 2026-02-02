@@ -15,13 +15,18 @@ type Handler interface {
 type LogHandler struct{}
 
 func (h *LogHandler) Handle(payload *Payload) {
-	logPayload := struct {
+	var logPayload struct {
 		Name string `json:"name"`
 		Data string `json:"data"`
-	}{
-		Name: payload.Name,
-		Data: payload.Data,
 	}
+
+	err := json.Unmarshal([]byte(payload.Data), &logPayload)
+
+	if err != nil {
+		log.Printf("Error unmarshaling log payload: %v\n", err)
+		return
+	}
+
 	logData, _ := json.MarshalIndent(logPayload, "", "  ")
 	body := bytes.NewBuffer(logData)
 
