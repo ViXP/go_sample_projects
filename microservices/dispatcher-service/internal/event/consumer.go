@@ -29,7 +29,7 @@ func (c *Consumer) Listen(topics ...string) error {
 		}
 	}
 
-	deliveries, err := channel.Consume(c.queueName, "", true, false, false, false, nil)
+	deliveries, err := channel.Consume(c.queueName, "", false, false, false, false, nil)
 
 	if err != nil {
 		return err
@@ -40,7 +40,17 @@ func (c *Consumer) Listen(topics ...string) error {
 	go func() {
 		for message := range deliveries {
 			var payload Payload
-			_ = json.Unmarshal(message.Body, &payload)
+			err = json.Unmarshal(message.Body, &payload)
+
+			if err != nil {
+				log.Println("Error unmarshalling message body:", err)
+				message.Nack(false, true)
+				continue
+			}
+
+			message.Ack(false)
+			payload.RoutingKey = message.RoutingKey
+			log.Println("Received message with topic:", message.RoutingKey)
 			go payload.Handle()
 		}
 	}()
@@ -66,7 +76,7 @@ func (c *Consumer) setup() error {
 		true,
 		false,
 		false,
-		false,
+		true,
 		nil,
 	)
 
@@ -79,7 +89,7 @@ func (c *Consumer) setup() error {
 		true,
 		false,
 		false,
-		false,
+		true,
 		nil,
 	)
 

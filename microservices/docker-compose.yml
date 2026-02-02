@@ -103,21 +103,27 @@ services:
 
   broker:
     <<: *runner
+    depends_on:
+      - rabbitmq
     ports:
       - "81:80"
     volumes:
       - ./broker-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
     environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - AUTH_URL=http://auth:80
       - LOGGER_URL=http://logger:80
       - MAILER_URL=http://mailer:80
   broker_builder:
     <<: *builder
+    depends_on:
+      - rabbitmq
     volumes:
       - ./broker-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
     environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - AUTH_URL=http://auth_builder:80
       - LOGGER_URL=http://logger_builder:80
       - MAILER_URL=http://mailer_builder:80
@@ -203,8 +209,8 @@ services:
       - ./api-view-helpers:/api-view-helpers:rw
     environment:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
-      - AUTH_URL=http://auth:80
-      - LOGGER_URL=http://logger:80
+      - AUTH_URL=http://auth_builder:80
+      - LOGGER_URL=http://logger_builder:80
 
 volumes:
   db_data: {}
