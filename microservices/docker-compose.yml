@@ -190,6 +190,10 @@ services:
     volumes:
       - ./dispatcher-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - AUTH_URL=http://auth:80
+      - LOGGER_URL=http://logger:80
   dispatcher_builder:
     <<: *builder
     depends_on:
@@ -197,6 +201,10 @@ services:
     volumes:
       - ./dispatcher-service:/go:rw
       - ./api-view-helpers:/api-view-helpers:rw
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - AUTH_URL=http://auth:80
+      - LOGGER_URL=http://logger:80
 
 volumes:
   db_data: {}
