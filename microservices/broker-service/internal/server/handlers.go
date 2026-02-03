@@ -6,20 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/rpc"
 	"os"
 
 	apiview "github.com/ViXP/go_sample_projects/microservices/api-view-helpers"
 )
-
-func (app *App) TriggerBroker(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	responsePayload := apiview.JsonResponse{
-		Error:   false,
-		Message: "Broker Service is triggered",
-	}
-
-	_ = apiview.WriteJSON(w, http.StatusOK, responsePayload)
-}
 
 func (app *App) HandleProxyRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -39,10 +30,20 @@ func (app *App) HandleProxyRequest(w http.ResponseWriter, r *http.Request) {
 	case "log":
 		app.PublishLogEvent(w, r, requestPayload.Log)
 	case "mail":
-		app.SendMail(w, r, requestPayload.Mail)
+		app.SendMailRPC(w, requestPayload.Mail)
 	default:
 		apiview.ErrorJSON(w, errors.New("unknown action"), http.StatusBadRequest)
 	}
+}
+
+func (app *App) TriggerBroker(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	responsePayload := apiview.JsonResponse{
+		Error:   false,
+		Message: "Broker Service is triggered",
+	}
+
+	_ = apiview.WriteJSON(w, http.StatusOK, responsePayload)
 }
 
 func (app *App) Authenticate(w http.ResponseWriter, r *http.Request, a AuthPayload) {
@@ -132,6 +133,29 @@ func (app *App) SendMail(w http.ResponseWriter, r *http.Request, payload MailerP
 	}
 
 	apiview.WriteJSON(w, response.StatusCode, responsePayload)
+}
+
+func (app *App) SendMailRPC(w http.ResponseWriter, payload MailerPayload) {
+	rpcClient, err := rpc.Dial("tcp", os.Getenv("MAILER_RPC_URL"))
+
+	if err != nil {
+		apiview.ErrorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	var reply string
+
+	err = rpcClient.Call("RPCProcedures.SendMail", payload, &reply)
+
+	if err != nil {
+		apiview.ErrorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	apiview.WriteJSON(w, http.StatusCreated, apiview.JsonResponse{
+		Error:   false,
+		Message: reply,
+	})
 }
 
 func (app *App) PublishLogEvent(w http.ResponseWriter, r *http.Request, payload LogPayload) {

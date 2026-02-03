@@ -8,8 +8,7 @@ import (
 )
 
 const (
-	port    = 80
-	rpcPort = 5001
+	port = 80
 )
 
 func main() {
