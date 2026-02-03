@@ -36,6 +36,7 @@ func (app *App) HandleProxyRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// REST handlers
 func (app *App) TriggerBroker(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	responsePayload := apiview.JsonResponse{
@@ -135,6 +136,7 @@ func (app *App) SendMail(w http.ResponseWriter, r *http.Request, payload MailerP
 	apiview.WriteJSON(w, response.StatusCode, responsePayload)
 }
 
+// RPC handlers
 func (app *App) SendMailRPC(w http.ResponseWriter, payload MailerPayload) {
 	rpcClient, err := rpc.Dial("tcp", os.Getenv("MAILER_RPC_URL"))
 
@@ -157,6 +159,9 @@ func (app *App) SendMailRPC(w http.ResponseWriter, payload MailerPayload) {
 		Message: reply,
 	})
 }
+
+// RabbitMQ publishing handlers
+const rabbitExchangeName = "microservices_topics"
 
 func (app *App) PublishLogEvent(w http.ResponseWriter, r *http.Request, payload LogPayload) {
 	serializedPayload, err := json.MarshalIndent(payload, "", "  ")
@@ -209,8 +214,6 @@ func (app *App) PublishAuthEvent(w http.ResponseWriter, r *http.Request, payload
 		Message: "Event emitted successfully.",
 	})
 }
-
-const rabbitExchangeName = "microservices_topics"
 
 func (app *App) emitEvent(routingKey string, payload EventPayload) error {
 	emitter, err := event.NewEmitter(app.RabbitConn, rabbitExchangeName)
