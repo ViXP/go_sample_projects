@@ -10,8 +10,6 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-const port = 80
-
 func main() {
 	pgConn, err := server.InitializeDBConnection()
 
@@ -26,7 +24,9 @@ func main() {
 		Models: data.NewModels(pgConn),
 	}
 
-	err = server.InitializeServer(&store, port)
+	go server.InitializeGRPCServer(&store)
+
+	err = server.InitializeServer(&store)
 
 	if err != nil {
 		log.Panic(err)
