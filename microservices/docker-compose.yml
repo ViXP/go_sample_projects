@@ -113,6 +113,7 @@ services:
     environment:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - AUTH_URL=http://auth:80
+      - AUTH_GRPC_URL=auth:50051
       - LOGGER_URL=http://logger:80
       - MAILER_URL=http://mailer:80
       - MAILER_RPC_URL=tcp://mailer:5001
@@ -126,6 +127,7 @@ services:
     environment:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - AUTH_URL=http://auth_builder:80
+      - AUTH_GRPC_URL=auth_builder:50051
       - LOGGER_URL=http://logger_builder:80
       - MAILER_URL=http://mailer_builder:80
       - MAILER_RPC_URL=tcp://mailer_builder:5001

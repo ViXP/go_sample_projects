@@ -2,14 +2,19 @@ package server
 
 import (
 	"broker-service/internal/event"
+	"broker-service/internal/grpc_server"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/rpc"
 	"os"
+	"time"
 
 	apiview "github.com/ViXP/go_sample_projects/microservices/api-view-helpers"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func (app *App) HandleProxyRequest(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +31,7 @@ func (app *App) HandleProxyRequest(w http.ResponseWriter, r *http.Request) {
 
 	switch requestPayload.Action {
 	case "auth":
-		app.Authenticate(w, r, requestPayload.Auth)
+		app.AuthenticateGRPC(w, r, requestPayload.Auth)
 	case "log":
 		app.PublishLogEvent(w, r, requestPayload.Log)
 	case "mail":
@@ -158,6 +163,43 @@ func (app *App) SendMailRPC(w http.ResponseWriter, payload MailerPayload) {
 		Error:   false,
 		Message: reply,
 	})
+}
+
+// gRPC handlers
+const grpcTimeout = 2 * time.Second
+
+func (app *App) AuthenticateGRPC(w http.ResponseWriter, r *http.Request, payload AuthPayload) {
+	conn, err := grpc.NewClient(os.Getenv("AUTH_GRPC_URL"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		apiview.ErrorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+	defer conn.Close()
+
+	serviceClient := grpc_server.NewAuthServiceClient(conn)
+
+	requestPayload := grpc_server.AuthRequestPayload{
+		Email:    payload.Email,
+		Password: payload.Password,
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), grpcTimeout)
+
+	defer cancel()
+
+	responsePayload, err := serviceClient.Authenticate(ctx, &requestPayload)
+
+	if err != nil {
+		apiview.ErrorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	if responsePayload.Error {
+		apiview.ErrorJSON(w, errors.New(responsePayload.Message), http.StatusUnauthorized)
+		return
+	}
+
+	apiview.WriteJSON(w, http.StatusAccepted, responsePayload)
 }
 
 // RabbitMQ publishing handlers
