@@ -9,6 +9,26 @@ brun:
 	docker compose up -d frontend_builder broker_builder auth_builder logger_builder mailer_builder dispatcher_builder
 	@echo "The containers started"
 
+build:
+	@echo "Building the images for push"
+	docker buildx build -f dockerfiles/auth-service.dockerfile -t vixp/auth-service:1.0.0 .
+	docker buildx build -f dockerfiles/broker-service.dockerfile -t vixp/broker-service:1.0.0 .
+	docker buildx build -f dockerfiles/dispatcher-service.dockerfile -t vixp/dispatcher-service:1.0.0 .
+	docker buildx build -f dockerfiles/logger-service.dockerfile -t vixp/logger-service:1.0.0 .
+	docker buildx build -f dockerfiles/mailer-service.dockerfile -t vixp/mailer-service:1.0.0 .
+	docker buildx build -f dockerfiles/frontend.dockerfile -t vixp/frontend:1.0.0 .
+	@echo "The images are built"
+
+push:
+	@echo "Pushing the Docker Hub images"
+	docker push vixp/auth-service:1.0.0
+	docker push vixp/broker-service:1.0.0
+	docker push vixp/dispatcher-service:1.0.0
+	docker push vixp/logger-service:1.0.0
+	docker push vixp/mailer-service:1.0.0
+	docker push vixp/frontend:1.0.0
+	@echo "All images are pushed"
+
 db:
 	@echo "Starting only the database and message brokers containers"
 	docker compose up -d db mongodb mongoexpress pgadmin rabbitmq

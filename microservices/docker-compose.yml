@@ -90,6 +90,8 @@ services:
   ### Microservices ###
   frontend:
     <<: *runner
+    build:
+      dockerfile: dockerfiles/frontend.dockerfile
     ports:
       - "80:80"
     volumes:
@@ -98,11 +100,15 @@ services:
       - BROKER_URL=http://localhost:81
   frontend_builder:
     <<: *builder
+    build:
+      dockerfile: dockerfiles/frontend.dockerfile
     volumes:
       - ./frontend:/go:rw
 
   broker:
     <<: *runner
+    build:
+      dockerfile: dockerfiles/broker-service.dockerfile
     depends_on:
       - rabbitmq
     ports:
@@ -119,6 +125,8 @@ services:
       - MAILER_RPC_URL=tcp://mailer:5001
   broker_builder:
     <<: *builder
+    build:
+      dockerfile: dockerfiles/broker-service.dockerfile
     depends_on:
       - rabbitmq
     volumes:
@@ -134,6 +142,8 @@ services:
 
   auth:
     <<: *runner
+    build:
+      dockerfile: dockerfiles/auth-service.dockerfile
     depends_on:
       - db
     ports:
@@ -146,6 +156,8 @@ services:
       - ./api-view-helpers:/api-view-helpers:rw
   auth_builder:
     <<: *builder
+    build:
+      dockerfile: dockerfiles/auth-service.dockerfile
     depends_on:
       - db
     environment:
@@ -157,6 +169,8 @@ services:
 
   logger:
     <<: *runner
+    build:
+      dockerfile: dockerfiles/logger-service.dockerfile
     depends_on:
       - mongodb
     volumes:
@@ -166,6 +180,8 @@ services:
       - MONGODB_URL=mongodb://mongoclient:mongoclientpass@mongodb:27017/
   logger_builder:
     <<: *builder
+    build:
+      dockerfile: dockerfiles/logger-service.dockerfile
     depends_on:
       - mongodb
     volumes:
@@ -176,6 +192,8 @@ services:
 
   mailer:
     <<: *runner
+    build:
+      dockerfile: dockerfiles/mailer-service.dockerfile
     depends_on:
       - mailhog
     volumes:
@@ -185,6 +203,8 @@ services:
       - SMTP_URL=smtp://test:test@mailhog:1025
   mailer_builder:
     <<: *builder
+    build:
+      dockerfile: dockerfiles/mailer-service.dockerfile
     depends_on:
       - mailhog
     volumes:
@@ -195,6 +215,8 @@ services:
 
   dispatcher:
     <<: *runner
+    build:
+      dockerfile: dockerfiles/dispatcher-service.dockerfile
     depends_on:
       - rabbitmq
     volumes:
@@ -206,6 +228,8 @@ services:
       - LOGGER_URL=http://logger:80
   dispatcher_builder:
     <<: *builder
+    build:
+      dockerfile: dockerfiles/dispatcher-service.dockerfile
     depends_on:
       - rabbitmq
     volumes:

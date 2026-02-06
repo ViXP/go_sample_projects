@@ -1,0 +1,60 @@
+services:
+  auth-service:
+    image: vixp/auth-service:1.0.0
+    deploy:
+      replicas: 1
+      mode: replicated
+    environment:
+      - POSTGRES_URL=postgres://dbclient:dbclientpass@db:5432/microservices_db?sslmode=disable
+      - LOGGER_URL=http://logger-service:80
+
+  broker-service:
+    image: vixp/broker-service:1.0.0
+    deploy:
+      replicas: 1
+      mode: replicated
+    ports:
+      - "81:80"
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - AUTH_URL=http://auth-service:80
+      - AUTH_GRPC_URL=auth-service:50051
+      - LOGGER_URL=http://logger-service:80
+      - MAILER_URL=http://mailer-service:80
+      - MAILER_RPC_URL=tcp://mailer-service:5001
+
+  dispatcher-service:
+    image: vixp/dispatcher-service:1.0.0
+    deploy:
+      replicas: 1
+      mode: replicated
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - AUTH_URL=http://auth-service:80
+      - LOGGER_URL=http://logger-service:80
+
+  logger-service:
+    image: vixp/logger-service:1.0.0
+    deploy:
+      replicas: 1
+      mode: replicated
+    environment:
+      - MONGODB_URL=mongodb://mongoclient:mongoclientpass@mongodb:27017/
+
+  mailer-service:
+    image: vixp/mailer-service:1.0.0
+    deploy:
+      replicas: 1
+      mode: replicated
+    environment:
+      - SMTP_URL=smtp://test:test@mailhog:1025
+
+  frontend:
+    image: vixp/frontend:1.0.0
+    deploy:
+      replicas: 1
+      mode: replicated
+    ports:
+      - "80:80"
+    environment:
+      - BROKER_URL=http://localhost:81
