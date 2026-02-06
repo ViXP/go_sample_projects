@@ -58,3 +58,41 @@ services:
       - "80:80"
     environment:
       - BROKER_URL=http://localhost:81
+
+  ### Other services ###
+
+  rabbitmq:
+    image: rabbitmq:4.2.3-management-alpine
+    ports:
+      - 15672:15672
+    deploy:
+      mode: global
+
+  mongodb:
+    image: mongo:8.2.3-noble
+    environment:
+      MONGO_INITDB_DATABASE: logs
+      MONGO_INITDB_ROOT_USERNAME: mongoclient
+      MONGO_INITDB_ROOT_PASSWORD: mongoclientpass
+    deploy:
+      mode: global
+    volumes:
+      - ./scripts/mongodb_seed.js:/docker-entrypoint-initdb.d/mongodb_seed.js:ro
+
+  db:
+    image: postgres:18-trixie
+    deploy:
+      mode: global
+    environment:
+      POSTGRES_USER: dbclient
+      POSTGRES_PASSWORD: dbclientpass
+      POSTGRES_DB: microservices_db
+    volumes:
+      - ./scripts/db_seed.sql:/docker-entrypoint-initdb.d/db_seed.sql:ro
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "8025:8025"
+    deploy:
+      mode: global

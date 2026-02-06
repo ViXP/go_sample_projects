@@ -1,5 +1,9 @@
 FROM golang:tip-trixie
 
-COPY frontend /go
+COPY frontend /go/service
 
-CMD ["go", "build", "-o", "compiled_app"]
+WORKDIR /go/service
+
+RUN go build -o compiled_app
+
+CMD ["./compiled_app"]

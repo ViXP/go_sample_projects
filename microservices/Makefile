@@ -29,6 +29,12 @@ push:
 	docker push vixp/frontend:1.0.0
 	@echo "All images are pushed"
 
+deploy_swarm:
+	@echo "Deploying the services into the local Swarm cluster"
+	docker swarm init
+	docker stack deploy -c swarm.yml distributed_app
+	@echo "Deployed"
+
 db:
 	@echo "Starting only the database and message brokers containers"
 	docker compose up -d db mongodb mongoexpress pgadmin rabbitmq

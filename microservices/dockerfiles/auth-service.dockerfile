@@ -1,6 +1,10 @@
 FROM golang:tip-trixie
 
-COPY auth-service /go
-COPY api-view-helpers /api-view-helpers
+COPY auth-service /go/service
+COPY api-view-helpers /go/api-view-helpers
 
-CMD ["go", "build", "-o", "compiled_app"]
+WORKDIR /go/service
+
+RUN go build -o compiled_app
+
+CMD ["./compiled_app"]

@@ -1,7 +1,6 @@
 services:
   _: &builder
     image: golang:tip-trixie
-    command: sh -c "go build -o compiled_app; ./compiled_app"
     deploy:
       replicas: 1
       mode: replicated
