@@ -14,7 +14,7 @@ services:
       replicas: 1
       mode: replicated
     ports:
-      - "81:80"
+      - "80:80"
     environment:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - AUTH_URL=http://auth-service:80
@@ -50,14 +50,14 @@ services:
       - SMTP_URL=smtp://test:test@mailhog:1025
 
   frontend:
-    image: vixp/frontend:1.0.0
+    image: vixp/frontend:1.0.1
     deploy:
       replicas: 1
       mode: replicated
     ports:
-      - "80:80"
+      - "8080:80"
     environment:
-      - BROKER_URL=http://localhost:81
+      - BROKER_URL=http://localhost:80
 
   ### Other services ###
 

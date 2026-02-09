@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"html/template"
 	"log"
@@ -9,10 +10,15 @@ import (
 )
 
 var partials []string = []string{
-	"./templates/base.layout.gohtml",
-	"./templates/head.partial.gohtml",
-	"./templates/footer.partial.gohtml",
+	"templates/base.layout.gohtml",
+	"templates/head.partial.gohtml",
+	"templates/footer.partial.gohtml",
 }
+
+//go:embed templates
+var embedded embed.FS
+
+const port = 80
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -20,17 +26,17 @@ func main() {
 		render(w, "index.page.gohtml")
 	})
 
-	fmt.Println("Starting server on :80")
-	http.ListenAndServe(":80", nil)
+	fmt.Println("Starting server on :", port)
+	http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 }
 
 func render(w http.ResponseWriter, specificTemplateName string) {
 	var templateFileNames []string
 
 	templateFileNames = append(templateFileNames, partials...)
-	templateFileNames = append(templateFileNames, "./templates/"+specificTemplateName)
+	templateFileNames = append(templateFileNames, "templates/"+specificTemplateName)
 
-	fullTemplate, err := template.ParseFiles(templateFileNames...)
+	fullTemplate, err := template.ParseFS(embedded, templateFileNames...)
 	if err != nil {
 		log.Panic(err)
 	}
