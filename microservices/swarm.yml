@@ -11,22 +11,20 @@ services:
   broker-service:
     image: vixp/broker-service:1.0.0
     deploy:
-      replicas: 1
+      replicas: 2
       mode: replicated
-    ports:
-      - "80:80"
     environment:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - AUTH_URL=http://auth-service:80
       - AUTH_GRPC_URL=auth-service:50051
       - LOGGER_URL=http://logger-service:80
       - MAILER_URL=http://mailer-service:80
-      - MAILER_RPC_URL=tcp://mailer-service:5001
+      - MAILER_RPC_URL=mailer-service:5001
 
   dispatcher-service:
     image: vixp/dispatcher-service:1.0.0
     deploy:
-      replicas: 1
+      replicas: 2
       mode: replicated
     environment:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
@@ -36,7 +34,7 @@ services:
   logger-service:
     image: vixp/logger-service:1.0.0
     deploy:
-      replicas: 1
+      replicas: 2
       mode: replicated
     environment:
       - MONGODB_URL=mongodb://mongoclient:mongoclientpass@mongodb:27017/
@@ -52,12 +50,10 @@ services:
   frontend:
     image: vixp/frontend:1.0.1
     deploy:
-      replicas: 1
+      replicas: 2
       mode: replicated
-    ports:
-      - "8080:80"
     environment:
-      - BROKER_URL=http://localhost:80
+      - BROKER_URL=https://localhost:81
 
   ### Other services ###
 
@@ -66,7 +62,8 @@ services:
     ports:
       - 15672:15672
     deploy:
-      mode: global
+      replicas: 1
+      mode: replicated
 
   mongodb:
     image: mongo:8.2.3-noble
@@ -75,14 +72,16 @@ services:
       MONGO_INITDB_ROOT_USERNAME: mongoclient
       MONGO_INITDB_ROOT_PASSWORD: mongoclientpass
     deploy:
-      mode: global
+      replicas: 1
+      mode: replicated
     volumes:
       - ./scripts/mongodb_seed.js:/docker-entrypoint-initdb.d/mongodb_seed.js:ro
 
   db:
     image: postgres:18-trixie
     deploy:
-      mode: global
+      replicas: 1
+      mode: replicated
     environment:
       POSTGRES_USER: dbclient
       POSTGRES_PASSWORD: dbclientpass
@@ -95,4 +94,25 @@ services:
     ports:
       - "8025:8025"
     deploy:
-      mode: global
+      replicas: 1
+      mode: replicated
+
+  webserver:
+    image: vixp/webserver:1.0.0
+    deploy:
+      replicas: 1
+      mode: replicated
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:
+    external: true

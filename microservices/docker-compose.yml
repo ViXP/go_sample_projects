@@ -86,6 +86,12 @@ services:
       replicas: 1
       mode: replicated
 
+  webserver:
+    build:
+      dockerfile: dockerfiles/webserver.dockerfile
+    deploy:
+      replicas: 1
+
   ### Microservices ###
   frontend:
     <<: *runner
