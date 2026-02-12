@@ -1,3 +1,5 @@
+version: "3"
+
 services:
   auth-service:
     image: vixp/auth-service:1.0.0
@@ -64,6 +66,9 @@ services:
     deploy:
       replicas: 1
       mode: replicated
+      placement:
+        constraints:
+          - "node.hostname==node1"
 
   mongodb:
     image: mongo:8.2.3-noble
@@ -74,6 +79,9 @@ services:
     deploy:
       replicas: 1
       mode: replicated
+      placement:
+        constraints:
+          - "node.hostname==node1"
     volumes:
       - ./scripts/mongodb_seed.js:/docker-entrypoint-initdb.d/mongodb_seed.js:ro
 
@@ -82,6 +90,9 @@ services:
     deploy:
       replicas: 1
       mode: replicated
+      placement:
+        constraints:
+          - "node.hostname==node1"
     environment:
       POSTGRES_USER: dbclient
       POSTGRES_PASSWORD: dbclientpass
@@ -96,12 +107,18 @@ services:
     deploy:
       replicas: 1
       mode: replicated
+      placement:
+        constraints:
+          - "node.hostname==node1"
 
   webserver:
     image: vixp/webserver:1.0.0
     deploy:
-      replicas: 1
+      replicas: 2
       mode: replicated
+      placement:
+        constraints:
+          - "node.hostname==node1"
     ports:
       - "80:80"
       - "81:81"
@@ -110,6 +127,7 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      - ./scripts/Caddyfile:/etc/caddy/Caddyfile:ro
 
 volumes:
   caddy_data:

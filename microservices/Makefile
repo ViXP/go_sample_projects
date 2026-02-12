@@ -37,6 +37,11 @@ deploy_swarm:
 	docker stack deploy -c swarm.yml distributed_app
 	@echo "Deployed"
 
+provision_swarm:
+	@echo "Provise Vagrant local machines for Swarm/Kubernetes"
+	vagrant up
+	@echo "Provised"
+
 db:
 	@echo "Starting only the database and message brokers containers"
 	docker compose up -d db mongodb mongoexpress pgadmin rabbitmq
