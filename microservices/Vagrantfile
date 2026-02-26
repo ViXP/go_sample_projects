@@ -74,6 +74,7 @@ Vagrant.configure("2") do |config|
     node1.vm.provision "shell", inline: <<-SHELL
       export VERSION_CODENAME=$(env -i bash -c '. /etc/os-release; echo $VERSION_CODENAME')
       export IP_ADDR=$(ip addr show eth1 | grep 'inet ' | awk '{print $2}' | cut -f1 -d'/')
+      sudo sh -c "echo 'export IP_ADDR=${IP_ADDR}' > /etc/profile.d/ip_addr.sh"
       sudo apt-get install ufw ca-certificates curl
       sudo install -m 0755 -d /etc/apt/keyrings
       sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -101,6 +102,8 @@ Vagrant.configure("2") do |config|
 
       # Initialize Swarm with local IP addr manually:
       # sudo docker swarm init --advertise-addr $IP_ADDR
+      # Deploy stack to the sward:
+      # sudo docker stack deploy -c /vagrant/swarm.yml microservices
     SHELL
   end
 
@@ -172,6 +175,7 @@ Vagrant.configure("2") do |config|
     node2.vm.provision "shell", inline: <<-SHELL
       export VERSION_CODENAME=$(env -i bash -c '. /etc/os-release; echo $VERSION_CODENAME')
       export IP_ADDR=$(ip addr show eth1 | grep 'inet ' | awk '{print $2}' | cut -f1 -d'/')
+      sudo sh -c "echo 'export IP_ADDR=${IP_ADDR}' > /etc/profile.d/ip_addr.sh"
       sudo apt-get install ufw ca-certificates curl
       sudo install -m 0755 -d /etc/apt/keyrings
       sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc

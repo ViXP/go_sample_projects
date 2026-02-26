@@ -17,7 +17,7 @@ build:
 	docker buildx build -f dockerfiles/logger-service.dockerfile -t vixp/logger-service:1.0.0 .
 	docker buildx build -f dockerfiles/mailer-service.dockerfile -t vixp/mailer-service:1.0.0 .
 	docker buildx build -f dockerfiles/frontend.dockerfile -t vixp/frontend:1.0.1 .
-	docker buildx build -f dockerfiles/webserver.dockerfile -t vixp/webserver:1.0.0 .
+	docker buildx build -f dockerfiles/webserver.dockerfile -t vixp/webserver:1.0.1 .
 	@echo "The images are built"
 
 push:
@@ -28,7 +28,7 @@ push:
 	docker push vixp/logger-service:1.0.0
 	docker push vixp/mailer-service:1.0.0
 	docker push vixp/frontend:1.0.1
-	docker push vixp/webserver:1.0.0
+	docker push vixp/webserver:1.0.1
 	@echo "All images are pushed"
 
 deploy_swarm:

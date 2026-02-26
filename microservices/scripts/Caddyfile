@@ -22,13 +22,13 @@
     }
 }
 
-localhost {
+frontend.microservices.local {
     encode zstd gzip
     import static
 
     reverse_proxy http://frontend:80
 }
 
-localhost:81 {
+backend.microservices.local {
     reverse_proxy http://broker-service:80
 }

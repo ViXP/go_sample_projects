@@ -55,7 +55,7 @@ services:
       replicas: 2
       mode: replicated
     environment:
-      - BROKER_URL=https://localhost:81
+      - BROKER_URL=https://backend.microservices.local
 
   ### Other services ###
 
@@ -112,7 +112,7 @@ services:
           - "node.hostname==node1"
 
   webserver:
-    image: vixp/webserver:1.0.0
+    image: vixp/webserver:1.0.1
     deploy:
       replicas: 2
       mode: replicated
