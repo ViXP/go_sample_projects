@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-host
+spec:
+  rules:
+  - host: "microservices.local"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
+  - host: "api.microservices.local"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: broker-service
+            port:
+              number: 80
+  - host: "mailhog.microservices.local"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: mailhog
+            port:
+              number: 8025
+  - host: "rabbit.microservices.local"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: rabbitmq
+            port:
+              number: 15672
