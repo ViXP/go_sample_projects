@@ -24,7 +24,7 @@ spec:
             cpu: "500m"
         env:
           - name: BROKER_URL
-            value: http://api.microservices.local
+            value: https://api.microservices.local
         ports:
           - containerPort: 80
 

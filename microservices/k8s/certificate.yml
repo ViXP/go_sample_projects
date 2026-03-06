@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: microservices-certificate
+spec:
+  secretName: microservices-tls-secret
+  dnsNames:
+    - microservices.local
+    - api.microservices.local
+    - rabbit.microservices.local
+    - mailhog.microservices.local
+  issuerRef:
+    name: microservices-cluster-issuer
+    kind: ClusterIssuer

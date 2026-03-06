@@ -3,44 +3,52 @@ kind: Ingress
 metadata:
   name: ingress-host
 spec:
+  ingressClassName: nginx
   rules:
-  - host: "microservices.local"
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: frontend
-            port:
-              number: 80
-  - host: "api.microservices.local"
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: broker-service
-            port:
-              number: 80
-  - host: "mailhog.microservices.local"
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: mailhog
-            port:
-              number: 8025
-  - host: "rabbit.microservices.local"
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: rabbitmq
-            port:
-              number: 15672
+    - host: "microservices.local"
+      http:
+        paths:
+        - pathType: Prefix
+          path: "/"
+          backend:
+            service:
+              name: frontend
+              port:
+                number: 80
+    - host: "api.microservices.local"
+      http:
+        paths:
+        - pathType: Prefix
+          path: "/"
+          backend:
+            service:
+              name: broker-service
+              port:
+                number: 80
+    - host: "mailhog.microservices.local"
+      http:
+        paths:
+        - pathType: Prefix
+          path: "/"
+          backend:
+            service:
+              name: mailhog
+              port:
+                number: 8025
+    - host: "rabbit.microservices.local"
+      http:
+        paths:
+        - pathType: Prefix
+          path: "/"
+          backend:
+            service:
+              name: rabbitmq
+              port:
+                number: 15672
+  tls:
+    - hosts:
+        - "microservices.local"
+        - "api.microservices.local"
+        - "mailhog.microservices.local"
+        - "rabbit.microservices.local"
+      secretName: microservices-tls-secret
